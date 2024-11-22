@@ -15,7 +15,7 @@ function invRotationMatrix = inverse3DRotationMatrix(rotationMatrix)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % checks if the input rotation matrix has the right size
-if (size(rotationMatrix, 1) != 3 || size(rotationMatrix, 2) != 3)
+if (size(rotationMatrix, 1) ~= 3 || size(rotationMatrix, 2) ~= 3)
 	fprintf('[ERROR] (inverseRotationMatrix) -> the size of the input rotation matrix is not 3x3!\n');
 end
 

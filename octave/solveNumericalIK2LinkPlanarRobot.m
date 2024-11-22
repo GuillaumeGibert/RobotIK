@@ -1,7 +1,17 @@
 function solveNumericalIK2LinkPlanarRobot(L1, L2, q1, q2, x_target, y_target, pController, rankThreshold, distanceThreshold)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % function solveNumericalIK2LinkPlanarRobot(L1, L2, q1, q2, x_target, y_target, pController, rankThreshold, distanceThreshold)
-% ex.: solveNumericalIK2LinkPlanarRobot(2.0, 1.0, 100, 50, -1.5, 0.1, 0.5, 0.2, 0.01)
+%
+% Variation of pController
+% ex.: solveNumericalIK2LinkPlanarRobot(2.0, 1.0, 100, 50, -1.5, 0.1, 500, 0.2, 0.01) %% pController is too large, cannot find the solution
+% ex.: solveNumericalIK2LinkPlanarRobot(2.0, 1.0, 100, 50, -1.5, 0.1, 50, 0.2, 0.01) %% pController is large, solution is found pretty fast
+% ex.: solveNumericalIK2LinkPlanarRobot(2.0, 1.0, 100, 50, -1.5, 0.1, 5, 0.2, 0.01) %% pController is small, solution is long to found
+%
+% Variation of rankThreshold
+% ex.: solveNumericalIK2LinkPlanarRobot(2.0, 1.0, 0, 0, -1.5, 0.1, 50, 2, 0.01) %% rankThreshold is too large, the robot starts at a singular position and cannot find the solution
+% ex.: solveNumericalIK2LinkPlanarRobot(2.0, 1.0, 0, 0, -1.5, 0.1, 50, 0.2, 0.01) %% rankThreshold is large, solution is found but the robot "sticks" to the singularity for a long period 
+% ex.: solveNumericalIK2LinkPlanarRobot(2.0, 1.0, 0, 0, -1.5, 0.1, 50, 0.02, 0.01) %% rankThreshold is small, solution is found and the robot goes out of the singular position very fast
+%
 % Task: solve Inverse Kinematics (if it exists) numerically for a 2-link planar robot and compare it to the analitical one
 %
 % Inputs:
@@ -72,20 +82,20 @@ while (estimationInProgress)
 	deltaQ = Jinv * Vee;
 	%5- Updates qi values
 	for l_joint=1:size(theta,1)
-		theta(l_joint) +=  deltaQ(l_joint)/pController;
+		theta(l_joint) =  theta(l_joint) + deltaQ(l_joint);
 	end
 	%6- Updates the current position of the ee
 	jTee = dh2ForwardKinematics(theta, d, a, alpha, 1);
 	X_current = jTee*[0 0 0 1]';
 	X_current(end) = [];
 	%7- Estimates the distance with the target position
-	distance = 0;
+	currentDistance = 0;
 	for l_coord=1:3
-		distance += (X_target(l_coord)-X_current(l_coord))^2;
+		currentDistance = currentDistance + (X_target(l_coord)-X_current(l_coord))^2;
 	end
-	distance = sqrt(distance);
+	currentDistance = sqrt(currentDistance);
 	%8- Checks if the loop must still run 
-	if (distance < distanceThreshold)
+	if (currentDistance < distanceThreshold)
 		estimationInProgress = 0;
 	end
 	%9- Estimates the position of the tip of J2 = ee
@@ -107,20 +117,20 @@ while (estimationInProgress)
 	subplot(1,3,2); % middle panel
 		xlabel('Iteration (a.u.)');
 		ylabel('qi value (°)');
-		plot(nbIterations, theta(1), 'b'); hold on;
-		plot(nbIterations, theta(2), 'r'); hold on;
+		plot(nbIterations, theta(1), 'b*'); hold on;
+		plot(nbIterations, theta(2), 'r*'); hold on;
 		%xlim([0 2000]);
 		ylim([-180 180]);
 	subplot(1,3,3); % middle panel
 		xlabel('Iteration (a.u.)');
 		ylabel('Distance to target (m)');
-		plot(nbIterations, distance, 'g'); hold on;
-		plot([1 nbIterations], [distanceThreshold distanceThreshold], 'r'); hold on;
+		plot(nbIterations, currentDistance, 'g*'); hold on;
+		plot([1 nbIterations], [distanceThreshold distanceThreshold], 'r*'); hold on;
 		%xlim([0 2000]);
 		ylim([0 2*(L1+L2)]);
 	end
 	
-	nbIterations++;
+	nbIterations = nbIterations+1;
 	pause(0.001);
 	
 end

@@ -19,7 +19,7 @@ function jTee = dh2ForwardKinematics(theta, d, a, alpha, jointNumber)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % checks if the arrays have the same size
-if (size(theta, 1) != size(d,1) || size(theta,1) != size(a, 1) || size(theta,1) != size(alpha, 1))
+if (size(theta, 1) ~= size(d,1) || size(theta,1) ~= size(a, 1) || size(theta,1) ~= size(alpha, 1))
 	disp('[ERROR](dh2ForwardKinematics)-> sizes of input arrays do not match!')
 	return;
 end

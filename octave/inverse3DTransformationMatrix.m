@@ -15,7 +15,7 @@ function invTransformationMatrix = inverse3DTransformationMatrix(transformMatrix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % checks if the input transform matrix has the right size
-if (size(transformMatrix, 1) != 4 || size(transformMatrix, 2) != 4)
+if (size(transformMatrix, 1) ~= 4 || size(transformMatrix, 2) ~= 4)
 	fprintf('[ERROR] (inverseTransformationMatrix) -> the size of the input transform matrix is not 4x4!\n');
 end
 
